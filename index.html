@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Irregular Code Converter</title>
+</head>
+<body>
+  <h1>Irregular Code Converter</h1>
+  <textarea id="inputText" placeholder="Enter your message..."></textarea>
+  <button onclick="convertText('encode')">Encode</button>
+  <button onclick="convertText('decode')">Decode</button>
+  <pre id="output"></pre>
+
+  <script>
+    const encodingRules = {
+      'b': 'r', 'c': 'p', 'd': 'l', 'f': 'm', 'g': 't', 'h': 'x',
+      'j': 'n', 'k': 'v', 'q': 's', 'z': 'sh', 'y': 'w',
+      'a': '2', 'e': '3', 'i': '1', 'o': '4', 'u': '5',
+      'dh': 'lx', 'kh': 'vx', 'ch': 'px', 'ph': 'cx'
+    };
+    const decodingRules = {};
+    for (const key in encodingRules) decodingRules[encodingRules[key]] = key;
+    decodingRules['sh'] = 'z';
+
+    function convertText(mode) {
+      const input = document.getElementById("inputText").value.toLowerCase();
+      let output = "";
+      let i = 0;
+      while (i < input.length) {
+        let converted = false;
+        if (i + 1 < input.length) {
+          const twoChars = input.substr(i, 2);
+          if (mode === 'encode' && encodingRules[twoChars]) {
+            output += encodingRules[twoChars];
+            i += 2;
+            converted = true;
+          } else if (mode === 'decode' && decodingRules[twoChars]) {
+            output += decodingRules[twoChars];
+            i += 2;
+            converted = true;
+          }
+        }
+        if (!converted) {
+          const ch = input[i];
+          if (mode === 'encode') {
+            if ('aeiou'.includes(ch)) {
+              let count = 1;
+              while (i + count < input.length && input[i + count] === ch) count++;
+              output += encodingRules[ch].repeat(count);
+              i += count;
+            } else if (encodingRules[ch]) {
+              output += encodingRules[ch];
+              i++;
+            } else {
+              output += ch;
+              i++;
+            }
+          } else {
+            if ('12345'.includes(ch)) {
+              let count = 1;
+              while (i + count < input.length && input[i + count] === ch) count++;
+              output += decodingRules[ch].repeat(count);
+              i += count;
+            } else if (decodingRules[ch]) {
+              output += decodingRules[ch];
+              i++;
+            } else {
+              output += ch;
+              i++;
+            }
+          }
+        }
+      }
+      document.getElementById("output").textContent = output;
+    }
+  </script>
+</body>
+  </html>
